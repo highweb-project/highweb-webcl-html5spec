@@ -1,0 +1,5 @@
+AXWebArea
+++AXGroup
+++++AXCheckBox AXTitle='CheckBox1' AXValue='0'
+++AXMenu
+++++AXCheckBox AXTitle='CheckBox2' AXValue='0'

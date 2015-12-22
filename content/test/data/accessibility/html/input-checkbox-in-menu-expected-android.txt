@@ -1,0 +1,5 @@
+android.webkit.WebView focusable focused scrollable
+++android.view.View
+++++android.widget.CheckBox checkable clickable focusable name='CheckBox1'
+++android.view.View
+++++android.widget.CheckBox checkable clickable focusable name='CheckBox2'
