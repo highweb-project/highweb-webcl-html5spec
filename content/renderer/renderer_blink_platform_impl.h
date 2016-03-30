@@ -16,6 +16,7 @@
 #include "third_party/WebKit/public/platform/WebGraphicsContext3D.h"
 #include "third_party/WebKit/public/platform/modules/indexeddb/WebIDBFactory.h"
 #include "third_party/WebKit/public/platform/modules/screen_orientation/WebScreenOrientationType.h"
+#include "device/calendar/calendar_manager.mojom.h"
 
 namespace cc {
 class ContextProvider;
@@ -32,6 +33,14 @@ class WebDeviceOrientationData;
 class WebGraphicsContext3DProvider;
 class WebMediaRecorderHandler;
 class WebServiceWorkerCacheStorage;
+class WebAppLauncherListener;
+class WebCalendarStatus;
+class WebDeviceCpuListener;
+class WebDeviceGalleryListener;
+class WebDeviceSoundListener;
+class WebDeviceStorageListener;
+struct WebDeviceGalleryMediaObject;
+struct WebDeviceGalleryFindOptions;
 }
 
 namespace scheduler {
@@ -52,6 +61,14 @@ class ThreadSafeSender;
 class WebClipboardImpl;
 class WebDatabaseObserverImpl;
 class WebFileSystemImpl;
+class AppLauncherDispatcher;
+class CalendarDispatcher;
+class DeviceApiContactManager;
+class DeviceApiMessagingManager;
+class DeviceCpuDispatcher;
+class DeviceGalleryDispatcher;
+class DeviceSoundDispatcher;
+class DeviceStorageDispatcher;
 
 class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
  public:
@@ -164,6 +181,34 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
                                  blink::WebStorageQuotaCallbacks) override;
   void vibrate(unsigned int milliseconds) override;
   void cancelVibration() override;
+
+  void launchApp(const blink::WebString& packageName, const blink::WebString& activityName, blink::WebAppLauncherListener* mCallback) override;
+  void removeApp(const blink::WebString& packageName, blink::WebAppLauncherListener* mCallback) override;
+  void getAppList(const blink::WebString& mimeType, blink::WebAppLauncherListener* mCallback) override;
+  void getApplicationInfo(const blink::WebString& packageName, const int flags, blink::WebAppLauncherListener* mCallback) override;
+  void resetAppLauncherDispatcher() override;
+
+  void resetCalendarDispatcher() override;
+  void calendarDeviceApiFindEvent(const blink::WebString& startBefore, const blink::WebString& startAfter, const blink::WebString& endBefore, const blink::WebString& endAfter, bool mutiple, blink::WebCalendarListener* mCallback) override;
+  void calendarDeviceApiAddEvent(blink::WebCalendarInfo* event, blink::WebCalendarListener* mCallback) override;
+  void calendarDeviceApiUpdateEvent(blink::WebCalendarInfo* event, blink::WebCalendarListener* mCallback) override;
+  void calendarDeviceApiDeleteEvent(const blink::WebString& id, blink::WebCalendarListener* mCallback) override;
+
+  void outputDeviceType(blink::WebDeviceSoundListener* callback) override;
+  void deviceVolume(blink::WebDeviceSoundListener* callback) override;
+  void resetDeviceSoundDispatcher() override;
+
+  void getDeviceStorage(blink::WebDeviceStorageListener* callback) override;
+  void resetDeviceStorageDispatcher() override;
+
+  void getDeviceCpuLoad(blink::WebDeviceCpuListener* callback) override;
+  void resetDeviceCpuDispatcher() override;
+
+  void findMedia(blink::WebDeviceGalleryFindOptions* findOptions, blink::WebDeviceGalleryListener* callback) override;
+  void getMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) override;
+  void deleteMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) override;
+  void resetDeviceGalleryDispatcher() override;
+
   blink::WebThread* currentThread() override;
   void recordRappor(const char* metric,
                     const blink::WebString& sample) override;
@@ -207,6 +252,20 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
   }
 
   blink::WebURLLoader* createURLLoader() override;
+
+  void findContact(blink::WebDeviceContactParameter* parameter) override;
+  void addContact(blink::WebDeviceContactParameter* parameter) override;
+  void deleteContact(blink::WebDeviceContactParameter* parameter) override;
+  void updateContact(blink::WebDeviceContactParameter* parameter) override;
+
+  void sendMessage(blink::WebDeviceMessageObject* message) override;
+  void findMessage(blink::WebDeviceMessagingParameter* parameter) override;
+  void addMessagingListener(blink::WebDeviceMessagingParameter* parameter) override;
+  void removeMessagingListener(blink::WebDeviceMessagingParameter* parameter) override;
+
+  #if defined(OS_LINUX)
+  base::SharedMemory* getSharedMemoryForWebCL(int size) override;
+  #endif
 
  private:
   bool CheckPreparsedJsCachingEnabled() const;
@@ -270,12 +329,22 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
 
   scoped_ptr<BatteryStatusDispatcher> battery_status_dispatcher_;
 
+  scoped_ptr<AppLauncherDispatcher> applauncher_dispatcher_;
+  scoped_ptr<CalendarDispatcher> calendar_dispatcher_;
+  scoped_ptr<DeviceSoundDispatcher> devicesound_dispatcher_;
+  scoped_ptr<DeviceStorageDispatcher> devicestorage_dispatcher_;
+  scoped_ptr<DeviceCpuDispatcher> devicecpu_dispatcher_;
+  scoped_ptr<DeviceGalleryDispatcher> devicegallery_dispatcher_;
+
   // Handle to the Vibration mojo service.
   device::VibrationManagerPtr vibration_manager_;
 
   IDMap<PlatformEventObserverBase, IDMapOwnPointer> platform_event_observers_;
 
   scheduler::RendererScheduler* renderer_scheduler_;  // NOT OWNED
+
+  scoped_ptr<DeviceApiContactManager> device_contact_manager_;
+  scoped_ptr<DeviceApiMessagingManager> device_messaging_manager_;
 
   DISALLOW_COPY_AND_ASSIGN(RendererBlinkPlatformImpl);
 };

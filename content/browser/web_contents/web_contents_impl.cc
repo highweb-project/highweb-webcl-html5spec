@@ -2098,6 +2098,12 @@ void WebContentsImpl::RequestMediaAccessPermission(
   }
 }
 
+void WebContentsImpl::RequestDeviceApiPermission(const DeviceApiPermissionRequest& request)
+{
+	if (delegate_)
+		delegate_->RequestDeviceApiPermission(this, request);
+}
+
 bool WebContentsImpl::CheckMediaAccessPermission(const GURL& security_origin,
                                                  MediaStreamType type) {
   DCHECK(type == MEDIA_DEVICE_AUDIO_CAPTURE ||

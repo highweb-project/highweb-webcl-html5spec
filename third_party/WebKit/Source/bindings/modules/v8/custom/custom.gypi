@@ -9,6 +9,7 @@
             'V8CustomSQLStatementErrorCallback.cpp',
             'V8DeviceMotionEventCustom.cpp',
             'V8ServiceWorkerMessageEventCustom.cpp',
+            'V8AppLauncherCustom.cpp',
             'V8WebCLCommandQueueCustom.cpp',
             'V8WebCLKernelCustom.cpp',
             'V8WebCLProgramCustom.cpp',

@@ -98,6 +98,7 @@
             'dom/Uint8ClampedArray.idl',
             'dom/URLSearchParams.idl',
             'dom/XMLDocument.idl',
+            'dom/SendAndroidBroadcastCallback.idl',
             'dom/shadow/ShadowRoot.idl',
             'editing/Selection.idl',
             'events/AnimationEvent.idl',

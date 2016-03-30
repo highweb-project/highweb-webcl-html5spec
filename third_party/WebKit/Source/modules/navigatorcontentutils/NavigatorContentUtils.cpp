@@ -168,24 +168,6 @@ void NavigatorContentUtils::registerProtocolHandler(Navigator& navigator, const 
     NavigatorContentUtils::from(*navigator.frame())->client()->registerProtocolHandler(scheme, document->completeURL(url), title);
 }
 
-void NavigatorContentUtils::registerContentHandler(Navigator& navigator, const String& scheme, const String& url, const String& title, ExceptionState& exceptionState)
-{
-    if (!navigator.frame())
-        return;
-
-    Document* document = navigator.frame()->document();
-    ASSERT(document);
-
-    if (!verifyCustomHandlerURL(*document, url, exceptionState))
-        return;
-
-    if (!verifyCustomHandlerScheme(scheme, exceptionState))
-        return;
-
-    ASSERT(navigator.frame()->page());
-    NavigatorContentUtils::from(*navigator.frame())->client()->registerProtocolHandler(scheme, document->completeURL(url), title);
-}
-
 static String customHandlersStateString(const NavigatorContentUtilsClient::CustomHandlersState state)
 {
     DEFINE_STATIC_LOCAL(const String, newHandler, ("new"));
@@ -243,6 +225,34 @@ void NavigatorContentUtils::unregisterProtocolHandler(Navigator& navigator, cons
     NavigatorContentUtils::from(*navigator.frame())->client()->unregisterProtocolHandler(scheme, document->completeURL(url));
 }
 
+const char* NavigatorContentUtils::supplementName()
+{
+    return "NavigatorContentUtils";
+}
+
+void provideNavigatorContentUtilsTo(LocalFrame& frame, PassOwnPtrWillBeRawPtr<NavigatorContentUtilsClient> client)
+{
+    NavigatorContentUtils::provideTo(frame, NavigatorContentUtils::supplementName(), NavigatorContentUtils::create(client));
+}
+
+void NavigatorContentUtils::registerContentHandler(Navigator& navigator, const String& scheme, const String& url, const String& title, ExceptionState& exceptionState)
+{
+    if (!navigator.frame())
+        return;
+
+    Document* document = navigator.frame()->document();
+    ASSERT(document);
+
+    if (!verifyCustomHandlerURL(*document, url, exceptionState))
+        return;
+
+    if (!verifyCustomHandlerScheme(scheme, exceptionState))
+        return;
+
+    ASSERT(navigator.frame()->page());
+    NavigatorContentUtils::from(*navigator.frame())->client()->registerProtocolHandler(scheme, document->completeURL(url), title);
+}
+
 void NavigatorContentUtils::unregisterContentHandler(Navigator& navigator, const String& scheme, const String& url, ExceptionState& exceptionState)
 {
     if (!navigator.frame())
@@ -259,16 +269,6 @@ void NavigatorContentUtils::unregisterContentHandler(Navigator& navigator, const
 
     ASSERT(navigator.frame()->page());
     NavigatorContentUtils::from(*navigator.frame())->client()->unregisterProtocolHandler(scheme, document->completeURL(url));
-}
-
-const char* NavigatorContentUtils::supplementName()
-{
-    return "NavigatorContentUtils";
-}
-
-void provideNavigatorContentUtilsTo(LocalFrame& frame, PassOwnPtrWillBeRawPtr<NavigatorContentUtilsClient> client)
-{
-    NavigatorContentUtils::provideTo(frame, NavigatorContentUtils::supplementName(), NavigatorContentUtils::create(client));
 }
 
 } // namespace blink

@@ -175,6 +175,8 @@ public:
 
     PassOwnPtr<WebFrameScheduler> createFrameScheduler() override;
 
+    void sendAndroidBroadcast(LocalFrame*, const String&) override;
+
 private:
     explicit ChromeClientImpl(WebViewImpl*);
 

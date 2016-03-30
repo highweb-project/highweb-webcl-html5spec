@@ -23,7 +23,7 @@ static bool isASCIILineBreakOrWhiteSpaceCharacter(UChar c)
 	return c == '\r' || c == '\n' || c == ' ';
 }
 
-WebCLProgram::WebCLProgram(WebCL* context, 
+WebCLProgram::WebCLProgram(WebCL* context,
 		cl_program program) : mContext(context), mClProgram(program)
 {
 	mBuildCallback = nullptr;
@@ -42,7 +42,7 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, CLenum paramName, Ex
 	cl_uint uint_units = 0;
 	size_t sizet_units = 0;
 	char program_string[4096];
-	HeapVector<Member<WebCLDevice>> deviceList;
+	// HeapVector<Member<WebCLDevice>> deviceList;
 	Member<WebCLDevice> deviceObj = nullptr;
 	size_t szParmDataBytes = 0;
 	if (mClProgram == NULL) {
@@ -52,7 +52,7 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, CLenum paramName, Ex
 	}
 
 	switch(paramName)
-	{   
+	{
 		case WebCL::PROGRAM_REFERENCE_COUNT:
 			err = webcl_clGetProgramInfo(webcl_channel_, mClProgram, CL_PROGRAM_REFERENCE_COUNT , sizeof(cl_uint), &uint_units, NULL);
 			if (err == CL_SUCCESS)
@@ -91,7 +91,7 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, CLenum paramName, Ex
 					cdDevices = (cl_device_id*) malloc(szParmDataBytes);
 					webcl_clGetProgramInfo(webcl_channel_, mClProgram, CL_PROGRAM_DEVICES, szParmDataBytes, cdDevices, NULL);
 					for(unsigned int i = 0; i < szParmDataBytes; i++) {
-						deviceObj = mContext->findCLDevice((cl_obj_key)(cdDevices[i]), ec);	
+						deviceObj = mContext->findCLDevice((cl_obj_key)(cdDevices[i]), ec);
 						if (deviceObj == nullptr) {
 							CLLOG(INFO) << "deviceObj is NULL";
 							continue;
@@ -99,10 +99,10 @@ ScriptValue WebCLProgram::getInfo(ScriptState* scriptState, CLenum paramName, Ex
 						mDeviceList.append(deviceObj.get());
 					}
 					free(cdDevices);
-					
+
 				}
 			}
-			return ScriptValue(scriptState, toV8(deviceList, creationContext, isolate));
+			return ScriptValue(scriptState, toV8(mDeviceList, creationContext, isolate));
 			break;
 		default:
 			ec.throwDOMException(WebCLException::INVALID_PROGRAM, "WebCLException::INVALID_PROGRAM");
@@ -157,7 +157,7 @@ ScriptValue WebCLProgram::getBuildInfo(ScriptState* scriptState, WebCLDevice* de
 			return ScriptValue(scriptState, v8::Null(isolate));
 	}
 	WebCLException::throwException(err, ec);
-	return ScriptValue(scriptState, v8::Null(isolate));	
+	return ScriptValue(scriptState, v8::Null(isolate));
 }
 
 void WebCLProgram::build(const HeapVector<Member<WebCLDevice>>& devices, const String& buildOptions, WebCLCallback* callback, ExceptionState& ec)
@@ -181,7 +181,7 @@ void WebCLProgram::build(const HeapVector<Member<WebCLDevice>>& devices, const S
 				cdDevices = (cl_device_id*) malloc(szParmDataBytes);
 				err = webcl_clGetProgramInfo(webcl_channel_, mClProgram, CL_PROGRAM_DEVICES, szParmDataBytes, cdDevices, NULL);
 				for(unsigned int i = 0; i < szParmDataBytes; i++) {
-					deviceObj = mContext->findCLDevice((cl_obj_key)(cdDevices[i]), ec);	
+					deviceObj = mContext->findCLDevice((cl_obj_key)(cdDevices[i]), ec);
 					if (deviceObj == nullptr) {
 						CLLOG(INFO) << "deviceObj is NULL";
 						continue;
@@ -202,7 +202,7 @@ void WebCLProgram::build(const HeapVector<Member<WebCLDevice>>& devices, const S
 		bool extensionEnabled = false;
 		size_t num_device = mDeviceList.size();
 		for(size_t i=0; i<num_device; i++) {
-			if((extension_kh16 != WTF::kNotFound && mDeviceList[i]->getEnableExtensionList().contains("KHR_fp16")) 
+			if((extension_kh16 != WTF::kNotFound && mDeviceList[i]->getEnableExtensionList().contains("KHR_fp16"))
 				|| (extension_kh64 != WTF::kNotFound && mDeviceList[i]->getEnableExtensionList().contains("KHR_fp64"))) {
 				extensionEnabled = true;
 				break;
@@ -362,7 +362,7 @@ void WebCLProgram::build(const String& options, WebCLCallback* callback, Excepti
 
 WebCLKernel* WebCLProgram::createKernel(	const String& kernel_name, ExceptionState& ec)
 {
-	cl_int err = 0;	
+	cl_int err = 0;
 	cl_kernel cl_kernel_id = NULL;
 	if (mClProgram == NULL) {
 		printf("Error: Invalid program object\n");

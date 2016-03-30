@@ -114,8 +114,6 @@ Renderbuffer::Renderbuffer(RenderbufferManager* manager,
       width_(0),
       height_(0) {
   manager_->StartTracking(this);
-
-  // DLOG(INFO) << "Renderbuffer::Renderbuffer, manager : " << manager << ", client_id : " << client_id << ", service_id : " << service_id;
 }
 
 Renderbuffer::~Renderbuffer() {

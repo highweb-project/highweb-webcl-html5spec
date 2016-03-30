@@ -811,8 +811,6 @@ void GLES2Implementation::GenRenderbuffers(GLsizei n, GLuint* renderbuffers) {
     }
   });
   CheckGLError();
-
-  // DLOG(INFO) << "GLES2Implementation::GenRenderbuffers, n : " << n << ", *renderbuffers : " << *renderbuffers;
 }
 
 void GLES2Implementation::GenSamplers(GLsizei n, GLuint* samplers) {

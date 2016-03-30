@@ -152,10 +152,16 @@ WebCLBuffer* WebCLContext::createBuffer(int memFlags, unsigned sizeInBytes, DOMA
 	WebCL_Result_createBuffer result = WebCL_Result_createBuffer();
 	mContext->getOperationResult(&result);
 
+	//add MemObject address check
+	if (result.buffer == (cl_point)NULL) {
+		result.result = WebCLException::WebCLExceptionCode::MEM_OBJECT_ALLOCATION_FAILURE;
+	}
+
 	if(result.result == CL_SUCCESS) {
 		WebCLBuffer* o = WebCLBuffer::create(mContext, this, (cl_mem)result.buffer, false);
 		CLLOG(INFO) << "created buffer=" << (cl_mem)result.buffer;
-		WebCLMemObjMap::AddResult addResult = mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
+		// WebCLMemObjMap::AddResult addResult = mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
+		mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
 
 		if(!setBufferInfo(o, ec)) {
 			CLLOG(INFO) << "Error: Invaild Error Type";
@@ -262,7 +268,8 @@ WebCLMemoryObject* WebCLContext::createExtensionMemoryObjectBase(int memFlags, v
 	} else {
 		if(objectType == OPENCL_OBJECT_TYPE::CL_BUFFER) {
 			WebCLBuffer* o = WebCLBuffer::create(mContext, this, cl_mem_id, false);
-			WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)o);
+			// WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)o);
+			mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)o);
 
 			if(!setBufferInfo(o, ec)) {
 				CLLOG(INFO) << "Error: Invaild Error Type";
@@ -275,7 +282,8 @@ WebCLMemoryObject* WebCLContext::createExtensionMemoryObjectBase(int memFlags, v
 		}
 		else if(objectType == OPENCL_OBJECT_TYPE::CL_IMAGE) {
 			WebCLImage* image = WebCLImage::create(mContext.get(), this, cl_mem_id, false);
-			WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+			// WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+			mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
 
 			return image;
 		}
@@ -492,7 +500,9 @@ WebCLImage* WebCLContext::createImage(int memFlags, WebCLImageDescriptor descrip
 
 	if(err == CL_SUCCESS) {
 		WebCLImage* image = WebCLImage::create(mContext.get(), this, cl_mem_id, false);
-		WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		// WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+
 		return image;
 	}
 	else {
@@ -585,7 +595,8 @@ WebCLImage* WebCLContext::createImage(int memFlags, HTMLVideoElement* srcVideo, 
 
 	if(err == CL_SUCCESS) {
 		WebCLImage* image = WebCLImage::create(mContext.get(), this, cl_mem_id, false);
-		WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		// WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
 		return image;
 	}
 	else {
@@ -755,7 +766,8 @@ WebCLUserEvent* WebCLContext::createUserEvent(ExceptionState& ec)
 		o->setIsUserEvent();
 		o->setHandlerKey(mCallbackHandler->getHandlerId());
 		o->setCLContext(this);
-		WebCLEventMap::AddResult result = mEventMap.set((cl_obj_key)event, o);
+		// WebCLEventMap::AddResult result = mEventMap.set((cl_obj_key)event, o);
+		mEventMap.set((cl_obj_key)event, o);
 		return o;
 	}
 	return NULL;
@@ -843,7 +855,8 @@ WebCLCommandQueue* WebCLContext::createCommandQueue(WebCLDevice* device, int pro
 	else {
 		WebCLCommandQueue* commandQueueObj =  WebCLCommandQueue::create(mContext.get(), mClContext, commandQueue);
 		commandQueueObj->setEnableExtensionList(mEnabledExtensionList);
-		WebCLCommandQueueMap::AddResult result = mCommandQueueMap.set((cl_obj_key)commandQueue, commandQueueObj);
+		// WebCLCommandQueueMap::AddResult result = mCommandQueueMap.set((cl_obj_key)commandQueue, commandQueueObj);
+		mCommandQueueMap.set((cl_obj_key)commandQueue, commandQueueObj);
 
 		mMemoryUtil->commandQueueCreated(commandQueueObj, ec);
 
@@ -1029,6 +1042,7 @@ void WebCLContext::releaseAll(ExceptionState& ec)
 	if (mKernelMap.size() > 0) {
 		for(WebCLKernelMap::iterator kernel_iter = mKernelMap.begin(); kernel_iter != mKernelMap.end(); ++kernel_iter) {
 			WebCLKernel* kernel = (WebCLKernel*)kernel_iter->value;
+			CLLOG(INFO) << "WebCLKernel = " << kernel;
 			if (kernel != NULL)
 				kernel->release(ec);
 		}
@@ -1258,7 +1272,8 @@ void  WebCLContext::addCLEvent(WebCLEvent* event)
 	if(event->getCLEvent() == nullptr)
 		return;
 
-	WebCLEventMap::AddResult result = mEventMap.set((cl_obj_key)event->getCLEvent(), event);
+	// WebCLEventMap::AddResult result = mEventMap.set((cl_obj_key)event->getCLEvent(), event);
+	mEventMap.set((cl_obj_key)event->getCLEvent(), event);
 	event->setHandlerKey(mCallbackHandler->getHandlerId());
 	event->setCLContext(this);
 }
@@ -1415,7 +1430,8 @@ WebCLProgram* WebCLContext::createProgram(const String& kernelSource, ExceptionS
 		o->setHandlerKey((unsigned)mCallbackHandler->getHandlerId());
 		o->setCLContext(this);
 
-		WebCLProgramMap::AddResult result = mProgramMap.set((cl_obj_key)cl_program_id, o);
+		// WebCLProgramMap::AddResult result = mProgramMap.set((cl_obj_key)cl_program_id, o);
+		mProgramMap.set((cl_obj_key)cl_program_id, o);
 		return o;
 	}
 	return NULL;
@@ -1602,7 +1618,8 @@ WebCLBuffer* WebCLContext::createFromGLBuffer(int memFlags, WebGLBuffer* glBuffe
 			return NULL;
 		}
 
-		WebCLMemObjMap::AddResult addResult = mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
+		// WebCLMemObjMap::AddResult addResult = mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
+		mMemObjMap.set(result.buffer, (WebCLMemoryObject*)o);
 
 		mGlBufferMap.set((cl_obj_key)result.serviceId, glBuffer);
 
@@ -1718,7 +1735,8 @@ WebCLImage* WebCLContext::createFromGLTexture(int memFlags, int textureTarget, i
 
 		cl_mem cl_mem_id = (cl_mem)result.image;		
 		WebCLImage* image = WebCLImage::create(mContext.get(), this, cl_mem_id, false);
-		WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		// WebCLMemObjMap::AddResult result = mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
+		mMemObjMap.set((cl_obj_key)cl_mem_id, (WebCLMemoryObject*)image);
 
 		return image;
 	}

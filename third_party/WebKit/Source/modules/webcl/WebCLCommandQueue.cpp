@@ -1748,6 +1748,17 @@ void WebCLCommandQueue::enqueueWriteImageCommonForExtension(
 		return;
 	}
 
+	if(event != nullptr) {
+		if(event->getCLContext() == nullptr) {
+				event->setCLContext(mClContext);
+		}
+
+		if(mNativeClContext != event->getCLContext()->getClContext()) {
+			ec.throwDOMException(WebCLException::INVALID_CONTEXT, "WebCLException::INVALID_CONTEXT");
+			return;
+		}
+	}
+
 	origin.append(0);
 	region.append(1);
 
@@ -2720,7 +2731,7 @@ void WebCLCommandQueue::enqueueReleaseGLObjects(
 		ec.throwDOMException(WebCLException::WEBCL_EXTENSION_NOT_ENABLED, "WebCLException::WEBCL_EXTENSION_NOT_ENABLED");
 		return;
 	}
-	
+
 	int waitEventListSize = 0;
 
 	if(!handleCmdQueueAndCLContext(ec))

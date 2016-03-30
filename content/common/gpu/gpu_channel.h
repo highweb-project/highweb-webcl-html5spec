@@ -986,7 +986,8 @@ class GpuChannelMessageFilter : public IPC::MessageFilter {
   // Maximum amount of time that we can spend in PREEMPTING.
   // It is reset when we transition to IDLE.
   base::TimeDelta max_preemption_time_;
-  
+
+  base::WeakPtr<GpuChannel> gpu_channel_;
   // The message_queue_ is used to handle messages on the main thread.
   scoped_refptr<GpuChannelMessageQueue> message_queue_;
   IPC::Sender* sender_;
@@ -1004,8 +1005,6 @@ class GpuChannelMessageFilter : public IPC::MessageFilter {
   bool future_sync_points_;
 
   gfx::CLApi* cl_api_;
-
-  base::WeakPtr<GpuChannel> gpu_channel_;
 };
 
 struct GpuChannelMessage {

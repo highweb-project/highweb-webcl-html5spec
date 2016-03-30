@@ -92,6 +92,18 @@
 #include "third_party/WebKit/public/platform/modules/device_orientation/WebDeviceOrientationListener.h"
 #include "ui/gfx/color_profile.h"
 #include "url/gurl.h"
+#include "content/renderer/applauncher/applauncher_dispatcher.h"
+#include "content/renderer/calendar/calendar_dispatcher.h"
+#include "content/renderer/device_api/device_api_contact_manager.h"
+#include "content/renderer/device_cpu/devicecpu_dispatcher.h"
+#include "content/renderer/device_gallery/devicegallery_dispatcher.h"
+#include "content/renderer/device_messaging/device_api_messaging_manager.h"
+#include "content/renderer/device_sensors/device_proximity_event_pump.h"
+#include "content/renderer/device_sound/devicesound_dispatcher.h"
+#include "content/renderer/device_storage/devicestorage_dispatcher.h"
+#include "third_party/WebKit/public/platform/modules/device_contact/WebDeviceContactParameter.h"
+#include "third_party/WebKit/public/platform/modules/device_messaging/WebDeviceMessageObject.h"
+#include "third_party/WebKit/public/platform/modules/device_messaging/WebDeviceMessagingParameter.h"
 
 #if defined(OS_ANDROID)
 #include "content/renderer/android/synchronous_compositor_factory.h"
@@ -1123,6 +1135,119 @@ RendererBlinkPlatformImpl::GetConnectedVibrationManagerService() {
   return vibration_manager_;
 }
 
+void RendererBlinkPlatformImpl::launchApp(const blink::WebString& packageName, const blink::WebString& activityName, blink::WebAppLauncherListener* mCallback) {
+  applauncher_dispatcher_.reset(new AppLauncherDispatcher());
+  applauncher_dispatcher_->launchApp(packageName, activityName, mCallback);
+}
+
+void RendererBlinkPlatformImpl::removeApp(const blink::WebString& packageName, blink::WebAppLauncherListener* mCallback) {
+  applauncher_dispatcher_.reset(new AppLauncherDispatcher());
+  applauncher_dispatcher_->removeApp(packageName, mCallback);
+}
+
+void RendererBlinkPlatformImpl::getAppList(const blink::WebString& mimeType, blink::WebAppLauncherListener* mCallback) {
+  applauncher_dispatcher_.reset(new AppLauncherDispatcher());
+  applauncher_dispatcher_->getAppList(mimeType, mCallback);
+}
+
+void RendererBlinkPlatformImpl::getApplicationInfo(const blink::WebString& packageName, int flags, blink::WebAppLauncherListener* mCallback) {
+  applauncher_dispatcher_.reset(new AppLauncherDispatcher());
+  applauncher_dispatcher_->getApplicationInfo(packageName, flags, mCallback);
+}
+
+void RendererBlinkPlatformImpl::resetAppLauncherDispatcher() {
+  if (applauncher_dispatcher_ != NULL) {
+    applauncher_dispatcher_.reset();
+  }
+}
+
+void RendererBlinkPlatformImpl::calendarDeviceApiDeleteEvent(const blink::WebString& id, blink::WebCalendarListener* mCallback) {
+  calendar_dispatcher_.reset(new CalendarDispatcher());
+  calendar_dispatcher_->calendarDeviceApiDeleteEvent(id, mCallback);
+}
+
+void RendererBlinkPlatformImpl::calendarDeviceApiFindEvent(const blink::WebString& startBefore, const blink::WebString& startAfter, const blink::WebString& endBefore, const blink::WebString& endAfter, bool multiple, blink::WebCalendarListener* mCallback) {
+  calendar_dispatcher_.reset(new CalendarDispatcher());
+  calendar_dispatcher_->calendarDeviceApiFindEvent(startBefore, startAfter, endBefore, endAfter, multiple, mCallback);
+}
+
+void RendererBlinkPlatformImpl::calendarDeviceApiAddEvent(blink::WebCalendarInfo* event, blink::WebCalendarListener* mCallback) {
+  calendar_dispatcher_.reset(new CalendarDispatcher());
+  calendar_dispatcher_->calendarDeviceApiAddEvent(event, mCallback);
+}
+
+void RendererBlinkPlatformImpl::calendarDeviceApiUpdateEvent(blink::WebCalendarInfo* event, blink::WebCalendarListener* mCallback) {
+  calendar_dispatcher_.reset(new CalendarDispatcher());
+  calendar_dispatcher_->calendarDeviceApiUpdateEvent(event, mCallback);
+}
+
+void RendererBlinkPlatformImpl::resetCalendarDispatcher() {
+  if (calendar_dispatcher_ != NULL) {
+    calendar_dispatcher_.reset();
+  }
+}
+
+void RendererBlinkPlatformImpl::outputDeviceType(blink::WebDeviceSoundListener* callback) {
+  devicesound_dispatcher_.reset(new DeviceSoundDispatcher());
+  devicesound_dispatcher_->outputDeviceType(callback);
+}
+
+void RendererBlinkPlatformImpl::deviceVolume(blink::WebDeviceSoundListener* callback) {
+  devicesound_dispatcher_.reset(new DeviceSoundDispatcher());
+  devicesound_dispatcher_->deviceVolume(callback);
+}
+
+void RendererBlinkPlatformImpl::resetDeviceSoundDispatcher() {
+  if (devicesound_dispatcher_ != NULL) {
+    devicesound_dispatcher_.reset();
+  }
+}
+
+void RendererBlinkPlatformImpl::getDeviceStorage(blink::WebDeviceStorageListener* callback) {
+  devicestorage_dispatcher_.reset(new DeviceStorageDispatcher());
+  devicestorage_dispatcher_->getDeviceStorage(callback);
+}
+
+void RendererBlinkPlatformImpl::resetDeviceStorageDispatcher() {
+  if (devicestorage_dispatcher_ != NULL) {
+    devicestorage_dispatcher_.reset();
+  }
+}
+
+void RendererBlinkPlatformImpl::getDeviceCpuLoad(blink::WebDeviceCpuListener* callback) {
+  devicecpu_dispatcher_.reset(new DeviceCpuDispatcher());
+  devicecpu_dispatcher_->getDeviceCpuLoad(callback);
+}
+void RendererBlinkPlatformImpl::resetDeviceCpuDispatcher() {
+  if (devicecpu_dispatcher_ != NULL) {
+    devicecpu_dispatcher_.reset();
+  }
+}
+
+void RendererBlinkPlatformImpl::findMedia(blink::WebDeviceGalleryFindOptions* findOptions, 
+  blink::WebDeviceGalleryListener* callback) {
+  devicegallery_dispatcher_.reset(new DeviceGalleryDispatcher());
+  devicegallery_dispatcher_->findMedia(findOptions, callback);
+}
+
+void RendererBlinkPlatformImpl::getMedia(blink::WebDeviceGalleryMediaObject* media, 
+  blink::WebDeviceGalleryListener* callback) {
+  devicegallery_dispatcher_.reset(new DeviceGalleryDispatcher());
+  devicegallery_dispatcher_->getMedia(media, callback);
+}
+
+void RendererBlinkPlatformImpl::deleteMedia(blink::WebDeviceGalleryMediaObject* media, 
+  blink::WebDeviceGalleryListener* callback) {
+  devicegallery_dispatcher_.reset(new DeviceGalleryDispatcher());
+  devicegallery_dispatcher_->deleteMedia(media, callback);
+}
+
+void RendererBlinkPlatformImpl::resetDeviceGalleryDispatcher() {
+  if (devicegallery_dispatcher_ != NULL) {
+    devicegallery_dispatcher_.reset();
+  }
+}
+
 //------------------------------------------------------------------------------
 
 // static
@@ -1150,6 +1275,8 @@ RendererBlinkPlatformImpl::CreatePlatformEventObserverFromType(
       return new GamepadSharedMemoryReader(thread);
     case blink::WebPlatformEventTypeScreenOrientation:
       return new ScreenOrientationObserver();
+    case blink::WebPlatformEventTypeDeviceProximity:
+      return new DeviceProximityEventPump(thread);
     default:
       // A default statement is required to prevent compilation errors when
       // Blink adds a new type.
@@ -1280,5 +1407,88 @@ void RendererBlinkPlatformImpl::MockBatteryStatusChangedForTesting(
     return;
   g_test_battery_status_listener->updateBatteryStatus(status);
 }
+
+void RendererBlinkPlatformImpl::findContact(blink::WebDeviceContactParameter* parameter)
+{
+	if(!device_contact_manager_) {
+		device_contact_manager_.reset(new DeviceApiContactManager());
+	}
+
+	device_contact_manager_->findContact(parameter);
+}
+
+void RendererBlinkPlatformImpl::addContact(blink::WebDeviceContactParameter* parameter)
+{
+	if(!device_contact_manager_) {
+		device_contact_manager_.reset(new DeviceApiContactManager());
+	}
+
+	device_contact_manager_->addContact(parameter);
+
+}
+
+void RendererBlinkPlatformImpl::deleteContact(blink::WebDeviceContactParameter* parameter)
+{
+	if(!device_contact_manager_) {
+		device_contact_manager_.reset(new DeviceApiContactManager());
+	}
+
+	device_contact_manager_->deleteContact(parameter);
+
+}
+
+void RendererBlinkPlatformImpl::updateContact(blink::WebDeviceContactParameter* parameter)
+{
+	if(!device_contact_manager_) {
+		device_contact_manager_.reset(new DeviceApiContactManager());
+	}
+
+	device_contact_manager_->updateContact(parameter);
+
+}
+
+void RendererBlinkPlatformImpl::sendMessage(blink::WebDeviceMessageObject* message)
+{
+	if(!device_messaging_manager_) {
+		device_messaging_manager_.reset(new DeviceApiMessagingManager());
+	}
+
+	scoped_ptr<blink::WebDeviceMessageObject> messagePtr;
+	messagePtr.reset(message);
+	device_messaging_manager_->SendMessage(messagePtr.Pass());
+}
+
+void RendererBlinkPlatformImpl::findMessage(blink::WebDeviceMessagingParameter* parameter)
+{
+	if(!device_messaging_manager_) {
+		device_messaging_manager_.reset(new DeviceApiMessagingManager());
+	}
+
+	device_messaging_manager_->FindMessage(parameter);
+}
+
+void RendererBlinkPlatformImpl::addMessagingListener(blink::WebDeviceMessagingParameter* parameter)
+{
+	if(!device_messaging_manager_) {
+		device_messaging_manager_.reset(new DeviceApiMessagingManager());
+	}
+
+	device_messaging_manager_->AddListener(parameter);
+}
+
+void RendererBlinkPlatformImpl::removeMessagingListener(blink::WebDeviceMessagingParameter* parameter)
+{
+	if(!device_messaging_manager_) {
+		device_messaging_manager_.reset(new DeviceApiMessagingManager());
+	}
+
+	device_messaging_manager_->RemoveListener(parameter);
+}
+
+#if defined(OS_LINUX)
+base::SharedMemory* RendererBlinkPlatformImpl::getSharedMemoryForWebCL(int size) {
+  return content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(size).release();
+}
+#endif
 
 }  // namespace content

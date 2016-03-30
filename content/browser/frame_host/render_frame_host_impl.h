@@ -510,6 +510,11 @@ class CONTENT_EXPORT RenderFrameHostImpl
                              const base::string16& message,
                              int32 line_no,
                              const base::string16& source_id);
+  // sendAndroidBroadcast
+  #if defined(OS_ANDROID)
+  void OnSendAndroidBroadcast(const base::string16& action);
+  #endif
+
   void OnDetach();
   void OnFrameFocused();
   void OnOpenURL(const FrameHostMsg_OpenURL_Params& params);

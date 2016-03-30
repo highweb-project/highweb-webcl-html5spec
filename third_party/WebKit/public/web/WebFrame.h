@@ -704,6 +704,8 @@ public:
 #endif
 #endif
 
+    virtual void sendAndroidBroadcastResponse(const WebString& action) { }
+
 protected:
     explicit WebFrame(WebTreeScopeType);
     virtual ~WebFrame();

@@ -97,25 +97,6 @@ std::string BuildOSCpuInfo() {
   if (android_build_id.size() > 0) {
     android_info_str += "Build/" + android_build_id;
   }
-/*
-  // Send information about the device.
-  bool semicolon_inserted = false;
-  std::string android_build_codename = base::SysInfo::GetAndroidBuildCodename();
-  std::string android_device_name = base::SysInfo::HardwareModelName();
-  if ("REL" == android_build_codename && android_device_name.size() > 0) {
-    android_info_str += "; " + android_device_name;
-    semicolon_inserted = true;
-  }
-
-  // Append the build ID.
-  std::string android_build_id = base::SysInfo::GetAndroidBuildID();
-  if (android_build_id.size() > 0) {
-    if (!semicolon_inserted) {
-      android_info_str += ";";
-    }
-    android_info_str += " Build/" + android_build_id;
-  }
-*/
 #endif
 
   base::StringAppendF(
@@ -140,9 +121,6 @@ std::string BuildOSCpuInfo() {
 #elif defined(OS_ANDROID)
       "%s",
       android_info_str.c_str()
-      //"Android %s%s",
-      //android_version_str.c_str(),
-      //android_info_str.c_str()
 #else
       "%s %s",
       unixinfo.sysname,  // e.g. Linux
@@ -197,37 +175,6 @@ std::string BuildUserAgentFromOSAndProduct(const std::string& os_info,
   // This is done to expose our product name in a manner that is maximally
   // compatible with Safari, we hope!!
   std::string user_agent;
-/*
-  char result[300] = {0,};
-  char *str = strstr((char *)os_info.c_str(), "Android");
-
-  if(str == NULL) {
-    strcpy(result, (char *)os_info.c_str());
-  }
-  else {
-    int size = str - (char *)os_info.c_str();
-    strncpy(result, (char *)os_info.c_str(), size);
-
-    char *str2 = strchr(str, ';');
-    strcat(result, str2+2);  
-  }
-
-  DLOG(INFO) << "keiichi " << result;
-*/
-/*  
-  //DLOG(INFO) << "keiichi " << os_info.c_str();
-  char *str = strstr((char *)os_info.c_str(), "S805");
-  //DLOG(INFO) << "keiichi str = " << str;
-
-  if(str == NULL) {
-    str = (char *)os_info.c_str();
-  }
-  else {
-    str = (char *)"Linux; S805 Build/KOT49H";
-  }
-
-  //DLOG(INFO) << "keiichi str = " << str;
-*/
   base::StringAppendF(
       &user_agent,
       "Mozilla/5.0 (%s) AppleWebKit/%d.%d (KHTML, like Gecko) %s Safari/%d.%d",
@@ -237,9 +184,6 @@ std::string BuildUserAgentFromOSAndProduct(const std::string& os_info,
       product.c_str(),
       WEBKIT_VERSION_MAJOR,
       WEBKIT_VERSION_MINOR);
-
-  //DLOG(INFO) << "keiichi " << user_agent.c_str();
-
   return user_agent;
 }
 

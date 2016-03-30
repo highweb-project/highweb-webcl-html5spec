@@ -69,6 +69,7 @@ class WebContentDecryptionModule;
 class WebCookieJar;
 class WebCString;
 class WebDataSource;
+class WebDeviceApiPermissionCheckClient;
 class WebEncryptedMediaClient;
 class WebExternalPopupMenu;
 class WebExternalPopupMenuClient;
@@ -198,6 +199,7 @@ public:
     // A new message was added to the console.
     virtual void didAddMessageToConsole(const WebConsoleMessage&, const WebString& sourceName, unsigned sourceLine, const WebString& stackTrace) { }
 
+    virtual void didSendAndroidBroadcast(const WebString& action) { }
 
     // Load commands -------------------------------------------------------
 
@@ -695,6 +697,9 @@ public:
     // Checks that the given audio sink exists and is authorized. The result is provided via the callbacks.
     // This method takes ownership of the callbacks pointer.
     virtual void checkIfAudioSinkExistsAndIsAuthorized(const WebString& sinkId, const WebSecurityOrigin&, WebSetSinkIdCallbacks*) { BLINK_ASSERT_NOT_REACHED(); }
+
+    // DeviceAPI ------------------------------------------------------------
+    virtual WebDeviceApiPermissionCheckClient* deviceApiPermissionClient() { return nullptr; }
 
 protected:
     virtual ~WebFrameClient() { }

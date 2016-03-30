@@ -233,14 +233,14 @@ GpuChannelMessageFilter::GpuChannelMessageFilter(
     gpu::PreemptionFlag* preempting_flag,
     bool future_sync_points)
     : preemption_state_(IDLE),
+      gpu_channel_(gpu_channel),
       message_queue_(message_queue),
       sender_(nullptr),
       peer_pid_(base::kNullProcessId),
       task_runner_(task_runner),
       preempting_flag_(preempting_flag),
       a_stub_is_descheduled_(false),
-      future_sync_points_(future_sync_points),
-      gpu_channel_(gpu_channel) {}
+      future_sync_points_(future_sync_points) {}
 
 GpuChannelMessageFilter::~GpuChannelMessageFilter() {}
 
@@ -709,8 +709,6 @@ GpuChannel::GpuChannel(GpuChannelManager* gpu_channel_manager,
 
 GpuChannel::~GpuChannel() {
   // Clear stubs first because of dependencies.
-  CLLOG(INFO) << "GpuChannel::~GpuChannel() : " << this;
-
   stubs_.clear();
 
   message_queue_->DeleteAndDisableMessages();
@@ -774,8 +772,6 @@ bool GpuChannel::Send(IPC::Message* message) {
            << " with type " << message->type();
 
   if (!channel_) {
-	  CLLOG(INFO) << "gpu channel, delete message!!!";
-
     delete message;
     return false;
   }

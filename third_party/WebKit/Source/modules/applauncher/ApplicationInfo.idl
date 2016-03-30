@@ -1,0 +1,18 @@
+// Copyright 2014 The Chromium Authors. All rights reserved.
+// Copyright (C) 2016 INFRAWARE, Inc. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+dictionary ApplicationInfo {
+	DOMString name = "";
+	DOMString className = "";
+	DOMString dataDir = "";
+	boolean enabled = false;
+	long flags = 0;
+	DOMString permission = "";
+	DOMString processName = "";
+	long targetSdkVersion = 0;
+	long theme = 0;
+	long uid = 0;
+	DOMString packageName = "";
+};

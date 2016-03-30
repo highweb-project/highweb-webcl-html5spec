@@ -347,6 +347,10 @@ public:
     void setDevToolsFrontend(WebDevToolsFrontendImpl* frontend) { m_webDevToolsFrontend = frontend; }
     WebDevToolsFrontendImpl* devToolsFrontend() { return m_webDevToolsFrontend; }
 
+    #if defined(OS_ANDROID)
+    void sendAndroidBroadcastResponse(const WebString&) override;
+    #endif
+
 #if ENABLE(OILPAN)
     DECLARE_TRACE();
 #endif

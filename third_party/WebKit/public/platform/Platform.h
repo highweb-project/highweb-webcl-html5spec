@@ -54,6 +54,11 @@
 #include "WebURLError.h"
 #include "WebVector.h"
 #include "WebWaitableEvent.h"
+#include "WebCalendarListener.h"
+
+#if defined(OS_LINUX)
+#include "base/memory/shared_memory.h"
+#endif
 
 class GrContext;
 
@@ -115,6 +120,17 @@ class WebURLLoader;
 class WebUnitTestSupport;
 struct WebLocalizedString;
 struct WebSize;
+class WebAppLauncherListener;
+class WebDeviceCpuListener;
+class WebDeviceGalleryListener;
+class WebDeviceSoundListener;
+class WebDeviceStorageListener;
+struct WebDeviceContactFindOptions;
+struct WebDeviceGalleryFindOptions;
+struct WebDeviceGalleryMediaObject;
+struct WebDeviceContactParameter;
+struct WebDeviceMessageObject;
+struct WebDeviceMessagingParameter;
 
 class Platform {
 public:
@@ -443,6 +459,36 @@ public:
     // Cancels the current vibration, if there is one.
     virtual void cancelVibration() { }
 
+    // App Launcher Function.
+    virtual void launchApp(const WebString& packageName, const WebString& activityName, WebAppLauncherListener* mCallback) {}
+    virtual void removeApp(const WebString& packageName, WebAppLauncherListener* mCallback) {}
+    virtual void getAppList(const WebString& mimeType, WebAppLauncherListener* mCallback) {}
+    virtual void getApplicationInfo(const WebString& packageName, const int flags, WebAppLauncherListener* mCallback) {}
+    virtual void resetAppLauncherDispatcher() {}
+
+    virtual void resetCalendarDispatcher() {}
+    virtual void calendarDeviceApiFindEvent(const WebString& startBefore, const WebString& startAfter, const WebString& endBefore, const WebString& endAfter, bool mutiple, WebCalendarListener* mCallback) {}
+    virtual void calendarDeviceApiAddEvent(WebCalendarInfo* event, WebCalendarListener* mCallback) {}
+    virtual void calendarDeviceApiUpdateEvent(WebCalendarInfo* event, WebCalendarListener* mCallback) {}
+    virtual void calendarDeviceApiDeleteEvent(const WebString& id, WebCalendarListener* mCallback) {}
+
+    //Device Sound Function
+    virtual void outputDeviceType(WebDeviceSoundListener* mCallback) {}
+    virtual void deviceVolume(WebDeviceSoundListener* mCallback) {}
+    virtual void resetDeviceSoundDispatcher() {}
+
+    //Device Storage Function
+    virtual void getDeviceStorage(WebDeviceStorageListener* mCallback) {}
+    virtual void resetDeviceStorageDispatcher() {}
+
+    virtual void getDeviceCpuLoad(WebDeviceCpuListener* mCallback) {}
+    virtual void resetDeviceCpuDispatcher() {}
+
+    //Device Gallery Function
+    virtual void findMedia(blink::WebDeviceGalleryFindOptions* findOptions, blink::WebDeviceGalleryListener* callback) {}
+    virtual void getMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) {}
+    virtual void deleteMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) {}
+    virtual void resetDeviceGalleryDispatcher() {}
 
     // Testing -------------------------------------------------------------
 
@@ -735,6 +781,23 @@ public:
     // Background Sync API------------------------------------------------------------
 
     virtual WebSyncProvider* backgroundSyncProvider() { return nullptr; }
+
+    // Device Contact API--------------------------------------------------
+    virtual void findContact(WebDeviceContactParameter* parameter) {};
+    virtual void addContact(WebDeviceContactParameter* parameter) {};
+    virtual void deleteContact(WebDeviceContactParameter* parameter) {};
+    virtual void updateContact(WebDeviceContactParameter* parameter) {};
+
+    // Device Messaging API--------------------------------------------------
+    virtual void sendMessage(WebDeviceMessageObject* message) {};
+    virtual void findMessage(WebDeviceMessagingParameter* parameter) {};
+    virtual void addMessagingListener(WebDeviceMessagingParameter* parameter) {};
+    virtual void removeMessagingListener(WebDeviceMessagingParameter* parameter) {};
+
+    //WebCL Shared Memory API------------------------------------------------
+    #if defined(OS_LINUX)
+    virtual base::SharedMemory* getSharedMemoryForWebCL(int size) {return nullptr;};
+    #endif
 
 protected:
     BLINK_PLATFORM_EXPORT Platform();

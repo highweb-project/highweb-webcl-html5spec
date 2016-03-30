@@ -7,6 +7,7 @@
 
 #include "ui/opencl/opencl_implementation.h"
 
+#include "base/sys_info.h"
 #include "base/files/file_path.h"
 #include "base/logging.h"
 #include "content/common/gpu/gpu_channel.h"
@@ -30,8 +31,8 @@ void InitializeStaticCLBindings(CLApi* apiImpl) {
 // check ICD Loader (*.icd) exist in "/system/vendor/Khronos/OpenCL/vendors/*.icd"
 // http://stackoverflow.com/questions/306533/how-do-i-get-a-list-of-files-in-a-directory-in-c
 	DIR *dir;
-	class dirent *ent;
-	class stat st;
+	struct dirent *ent;
+	struct stat st;
 
 	std::string directory = "/system/vendor/Khronos/OpenCL/vendors";
 
@@ -255,8 +256,28 @@ cl_int CLApi::doClGetDeviceIDs(
 		cl_uint* num_devices)
 {
 	CLLOG(INFO) << "WEBCL::CLApi::doClGetDeviceIDs, platform=" << platform << ", cl_device_type=" << device_type;
-	cl_int err = cl_get_device_ids_(platform, device_type, num_entries, devices, num_devices);
-	CLLOG(INFO) << ">>err=" << err;
+
+	std::string deviceName = base::SysInfo::HardwareModelName().data();
+	bool isNexus7 = (deviceName == "Nexus 7");
+	cl_int err = CL_SUCCESS;
+
+	if(isNexus7) {
+		if(device_type == CL_DEVICE_TYPE_ALL) {
+			device_type = CL_DEVICE_TYPE_GPU;
+			err = cl_get_device_ids_(platform, device_type, num_entries, devices, num_devices);
+		} else if(device_type == CL_DEVICE_TYPE_CPU) {
+			// do nothing
+			num_entries = 0;
+			devices = nullptr;
+			*num_devices = 0;
+		} else {
+			err = cl_get_device_ids_(platform, device_type, num_entries, devices, num_devices);
+		}
+	} else {
+		err = cl_get_device_ids_(platform, device_type, num_entries, devices, num_devices);
+	}
+
+	CLLOG(INFO) << ">>err=" << err << "num_entries : " << num_entries << ", devices : " << devices << ", *num_devices : " << *num_devices;;
 	CLLOG(INFO) << ">>result=" << devices << "::" << *num_devices;
 	return err;
 }
@@ -580,7 +601,7 @@ cl_int CLApi::doClReleaseProgram(
 cl_int CLApi::doClReleaseKernel(
 		cl_kernel kernel)
 {
-	CLLOG(INFO) << "doClReleaseKernel";
+	CLLOG(INFO) << "doClReleaseKernel " << (cl_kernel)kernel;
 	cl_int err = cl_release_kernel_(kernel);
 	CLLOG(INFO) << ">>err=" << err;
 	return err;
@@ -1717,7 +1738,7 @@ bool CLApi::setSharedMemory(base::SharedMemoryHandle dataHandle, base::SharedMem
 	bool result = true;
 
 	mSharedData.reset(new base::SharedMemory(dataHandle, false));
-	result &= mSharedData->Map(1024*1024*10);
+	result &= mSharedData->Map(1024*1024*20);
 	mSharedDataPtr = mSharedData->memory();
 	result &= mSharedDataPtr?true:false;
 

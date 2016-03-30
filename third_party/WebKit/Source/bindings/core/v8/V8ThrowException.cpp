@@ -77,10 +77,12 @@ v8::Local<v8::Value> V8ThrowException::createDOMException(v8::Isolate* isolate, 
     }
 
     v8::TryCatch tryCatch(isolate);
+	
     //check is WebCLException!
     v8::Local<v8::Value> exception;
     DOMException* domException = nullptr;
     WebCLException* webclException = nullptr;
+	
     if(WebCLException::isWebCLException(ec)) {
     	webclException = WebCLException::create(ec, sanitizedMessage, unsanitizedMessage);
     	exception = toV8(webclException, sanitizedCreationContext, isolate);
@@ -97,7 +99,6 @@ v8::Local<v8::Value> V8ThrowException::createDOMException(v8::Isolate* isolate, 
     ASSERT(!exception.IsEmpty());
 
     // Attach an Error object to the DOMException. This is then lazily used to get the stack value.
-    // Attach an Error object to the DOMException. This is then lazily used to get the stack value.
     v8::Local<v8::Value> error;
     if(WebCLException::isWebCLException(ec)) {
     	error = v8::Exception::Error(v8String(isolate, webclException->message()));
@@ -105,7 +106,7 @@ v8::Local<v8::Value> V8ThrowException::createDOMException(v8::Isolate* isolate, 
     else {
     	error = v8::Exception::Error(v8String(isolate, domException->message()));
     }
-    //v8::Local<v8::Value> error = v8::Exception::Error(v8String(isolate, domException->message()));
+	
     ASSERT(!error.IsEmpty());
     v8::Local<v8::Object> exceptionObject = exception.As<v8::Object>();
     v8::Maybe<bool> result = exceptionObject->SetAccessor(isolate->GetCurrentContext(), v8AtomicString(isolate, "stack"), domExceptionStackGetter, domExceptionStackSetter, v8::MaybeLocal<v8::Value>(error));

@@ -126,14 +126,16 @@ ScriptValue WebCLPlatform::getInfo (ScriptState* scriptState, int platform_info,
 	switch(platform_info)
 	{
 		case WebCL::PLATFORM_PROFILE:
-			err = webcl_clGetPlatformInfo(webcl_channel_, m_cl_platform_id, CL_PLATFORM_PROFILE, sizeof(platform_string), platform_string, NULL);
-			if (err == CL_SUCCESS)
-				return ScriptValue(scriptState, v8String(isolate, String(platform_string)));
+			// err = webcl_clGetPlatformInfo(webcl_channel_, m_cl_platform_id, CL_PLATFORM_PROFILE, sizeof(platform_string), platform_string, NULL);
+			// if (err == CL_SUCCESS)
+				// return ScriptValue(scriptState, v8String(isolate, String(platform_string)));
+			return ScriptValue(scriptState, v8String(isolate, String("WEBCL_PROFILE")));
 			break;
 		case WebCL::PLATFORM_VERSION:
-			err = webcl_clGetPlatformInfo(webcl_channel_, m_cl_platform_id, CL_PLATFORM_VERSION, sizeof(platform_string), platform_string, NULL);
-			if (err == CL_SUCCESS)
-				return ScriptValue(scriptState, v8String(isolate, String(platform_string)));
+			// err = webcl_clGetPlatformInfo(webcl_channel_, m_cl_platform_id, CL_PLATFORM_VERSION, sizeof(platform_string), platform_string, NULL);
+			// if (err == CL_SUCCESS)
+				// return ScriptValue(scriptState, v8String(isolate, String(platform_string)));
+			return ScriptValue(scriptState, v8String(isolate, String("WebCL 1.0")));
 			break;
 		case WebCL::PLATFORM_NAME:
 			err = webcl_clGetPlatformInfo(webcl_channel_, m_cl_platform_id, CL_PLATFORM_NAME, sizeof(platform_string), platform_string, NULL);
@@ -291,7 +293,7 @@ CLboolean WebCLPlatform::enableExtension(const String& extensionName, ExceptionS
 				} else if(interExtensionName == "cl_khr_fp16") {
 					enableExtensionList.append("KHR_fp16");
 				}
-			}		
+			}
 			return true;
 		}
 	}
@@ -456,4 +458,3 @@ Member<WebCLDevice> WebCLPlatform::findCLDevice(cl_obj_key key, ExceptionState& 
 }
 
 }
-

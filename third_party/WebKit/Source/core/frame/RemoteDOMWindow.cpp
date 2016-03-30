@@ -339,6 +339,16 @@ void RemoteDOMWindow::cancelIdleCallback(int id)
     ASSERT_NOT_REACHED();
 }
 
+void RemoteDOMWindow::sendAndroidBroadcast(const String& action, SendAndroidBroadcastCallback*)
+{
+    ASSERT_NOT_REACHED();
+}
+
+void RemoteDOMWindow::sendAndroidBroadcastResponse(const String& action)
+{
+    ASSERT_NOT_REACHED();
+}
+
 RemoteDOMWindow::RemoteDOMWindow(RemoteFrame& frame)
     : m_frame(&frame)
 {

@@ -1,0 +1,10 @@
+[
+ 	Constructor,
+    GarbageCollected,
+] interface ContactName {
+	attribute DOMString familyName;
+	attribute DOMString givenName;
+	attribute DOMString middleName;
+	attribute DOMString prefix;
+	attribute DOMString suffix;
+};

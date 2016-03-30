@@ -7,11 +7,10 @@
 GarbageCollected,
 ] interface WebCLKernel {
 	[CallWith=ScriptState, RaisesException] any getInfo (unsigned long kernelInfo);
-	[CallWith=ScriptState, RaisesException] any getWorkGroupInfo (WebCLDevice device, unsigned long name);
+	[CallWith=ScriptState, RaisesException] any getWorkGroupInfo (WebCLDevice? device, unsigned long name);
 	[Custom,RaisesException] WebCLKernelArgInfo getArgInfo(unsigned long index);
 
 	[RaisesException] void setArg(unsigned long index, any value);
 
 	[RaisesException] void release();
 };
-

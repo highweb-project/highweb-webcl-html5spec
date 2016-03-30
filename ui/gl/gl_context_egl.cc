@@ -179,7 +179,6 @@ bool GLContextEGL::IsCurrent(GLSurface* surface) {
 }
 
 void* GLContextEGL::GetHandle() {
-  // DLOG(INFO) << "GLContextEGL::GetHandle(), context_ : " << context_;
   return context_;
 }
 

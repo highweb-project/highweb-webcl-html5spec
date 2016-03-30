@@ -190,12 +190,12 @@ using WTF::ScopedLogger;
 #define CRASH() (__debugbreak(), IMMEDIATE_CRASH())
 #else
 #define CRASH() \
-    (WTFReportBacktrace(), (*(int*)0xfbadbeef = 0), IMMEDIATE_CRASH())
+    ((void)0)/*(WTFReportBacktrace(), (*(int*)0xfbadbeef = 0), IMMEDIATE_CRASH())*/
 #endif
 #endif
 
 #if COMPILER(CLANG)
-#define NO_RETURN_DUE_TO_CRASH NO_RETURN
+#define NO_RETURN_DUE_TO_CRASH /*NO_RETURN*/
 #else
 #define NO_RETURN_DUE_TO_CRASH
 #endif

@@ -601,6 +601,7 @@ void WebCLKernel::release(ExceptionState& ec)
 		ec.throwDOMException(WebCLException::INVALID_KERNEL, "WebCLException::INVALID_KERNEL");
 		return;
 	}
+	CLLOG(INFO) << "WebCLKernel::release : " << mClKernel;
 	err = webcl_clReleaseKernel(webcl_channel_, mClKernel);
 	if (err != CL_SUCCESS) {
 		WebCLException::throwException(err, ec);

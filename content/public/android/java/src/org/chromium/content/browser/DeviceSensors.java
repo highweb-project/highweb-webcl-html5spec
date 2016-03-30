@@ -88,6 +88,8 @@ class DeviceSensors implements SensorEventListener {
             Sensor.TYPE_GYROSCOPE);
     static final Set<Integer> DEVICE_LIGHT_SENSORS = CollectionUtil.newHashSet(
             Sensor.TYPE_LIGHT);
+    static final Set<Integer> DEVICE_PROXIMITY_SENSORS = CollectionUtil.newHashSet(
+            Sensor.TYPE_PROXIMITY);
 
     @VisibleForTesting
     final Set<Integer> mActiveSensors = new HashSet<Integer>();
@@ -99,6 +101,7 @@ class DeviceSensors implements SensorEventListener {
     boolean mDeviceOrientationIsActiveWithBackupSensors = false;
     boolean mDeviceOrientationAbsoluteIsActive = false;
     boolean mOrientationNotAvailable = false;
+    boolean mDeviceProximityIsActive = false;
 
     protected DeviceSensors(Context context, boolean relativeByDefault) {
         mAppContext = context.getApplicationContext();
@@ -178,6 +181,9 @@ class DeviceSensors implements SensorEventListener {
                 case ConsumerType.LIGHT:
                     success = registerSensors(DEVICE_LIGHT_SENSORS, rateInMicroseconds, true);
                     break;
+                case ConsumerType.PROXIMITY:
+                    success = registerSensors(DEVICE_PROXIMITY_SENSORS, rateInMicroseconds, true);
+                    break;
                 default:
                     Log.e(TAG, "Unknown event type: %d", eventType);
                     return false;
@@ -245,6 +251,10 @@ class DeviceSensors implements SensorEventListener {
 
             if (mDeviceLightIsActive && eventType != ConsumerType.LIGHT) {
                 sensorsToRemainActive.addAll(DEVICE_LIGHT_SENSORS);
+            }
+            
+            if (mDeviceProximityIsActive && eventType != ConsumerType.PROXIMITY) {
+                sensorsToRemainActive.addAll(DEVICE_PROXIMITY_SENSORS);
             }
 
             Set<Integer> sensorsToDeactivate = new HashSet<Integer>(mActiveSensors);
@@ -321,6 +331,11 @@ class DeviceSensors implements SensorEventListener {
             case Sensor.TYPE_LIGHT:
                 if (mDeviceLightIsActive) {
                     gotLight(values[0]);
+                }
+                break;
+            case Sensor.TYPE_PROXIMITY:
+                if (mDeviceProximityIsActive) {
+                    gotProximity(values[0]);
                 }
                 break;
             default:
@@ -485,6 +500,9 @@ class DeviceSensors implements SensorEventListener {
             case ConsumerType.LIGHT:
                 mDeviceLightIsActive = active;
                 return;
+            case ConsumerType.PROXIMITY:
+            mDeviceProximityIsActive = active;
+                return;
         }
     }
 
@@ -593,7 +611,15 @@ class DeviceSensors implements SensorEventListener {
             }
         }
     }
-
+    
+    protected void gotProximity(double value) {
+        synchronized (mNativePtrLock) {
+            if (mNativePtr != 0) {
+                nativeGotProximity(mNativePtr, value);
+            }
+        }
+    }
+    
     private Handler getHandler() {
         // TODO(timvolodine): Remove the mHandlerLock when sure that getHandler is not called
         // from multiple threads. This will be the case when device motion and device orientation
@@ -666,6 +692,13 @@ class DeviceSensors implements SensorEventListener {
      * Device Light value from Ambient Light sensors.
      */
     private native void nativeGotLight(
+            long nativeSensorManagerAndroid,
+            double value);
+    
+    /**
+     * Device Light value from Ambient Light sensors.
+     */
+    private native void nativeGotProximity(
             long nativeSensorManagerAndroid,
             double value);
 

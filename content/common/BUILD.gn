@@ -175,6 +175,7 @@ source_set("common") {
     "//ui/gfx/ipc",
     "//ui/shell_dialogs",
     "//url",
+    "//ui/opencl",
   ]
 
   if (!is_ios) {

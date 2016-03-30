@@ -6,16 +6,17 @@
 #include "config.h"
 #include "WebCLOperationHandler.h"
 
-#include "content/public/renderer/render_thread.h"
+// #include "content/public/renderer/render_thread.h"
 
 #include "base/bind.h"
 #include "base/logging.h"
 #include "base/memory/shared_memory.h"
 #include "base/process/process_handle.h"
+#include "public/platform/Platform.h"
 
 namespace blink {
 namespace {
-static int kMaxBufferSize = 1024 * 1024 * 10;
+static int kMaxBufferSize = 1024 * 1024 * 20;
 static int kMaxEventNum = 32;
 static int kMaxEventSize = 8 * 32;
 }
@@ -42,7 +43,8 @@ void WebCLOperationHandler::startHandling()
 		mSharedData = adoptPtr(new base::SharedMemory());
 		mSharedData->CreateAndMapAnonymous(kMaxBufferSize);
 #elif defined(OS_LINUX)
-		mSharedData = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(kMaxBufferSize).release());
+		// mSharedData = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(kMaxBufferSize).release());
+		mSharedData = adoptPtr(Platform::current()->getSharedMemoryForWebCL(kMaxBufferSize));
 		mSharedData->Map(kMaxBufferSize);
 #endif
 		mSharedData->ShareToProcess(base::GetCurrentProcessHandle(), &dataHandle);
@@ -52,7 +54,8 @@ void WebCLOperationHandler::startHandling()
 		mSharedOperation = adoptPtr(new base::SharedMemory());
 		mSharedOperation->CreateAndMapAnonymous(sizeof(BaseOperationData));
 #elif defined(OS_LINUX)
-		mSharedOperation = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(sizeof(BaseOperationData)).release());
+		// mSharedOperation = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(sizeof(BaseOperationData)).release());
+		 mSharedOperation = adoptPtr(Platform::current()->getSharedMemoryForWebCL(sizeof(BaseOperationData)));
 		mSharedOperation->Map(sizeof(BaseOperationData));
 #endif
 		mSharedOperation->ShareToProcess(base::GetCurrentProcessHandle(), &operationHandle);
@@ -62,7 +65,8 @@ void WebCLOperationHandler::startHandling()
 		mSharedResult = adoptPtr(new base::SharedMemory());
 		mSharedResult->CreateAndMapAnonymous(sizeof(BaseResultData));
 #elif defined(OS_LINUX)
-		mSharedResult = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(sizeof(BaseResultData)).release());
+		// mSharedResult = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(sizeof(BaseResultData)).release());
+		mSharedResult = adoptPtr(Platform::current()->getSharedMemoryForWebCL(sizeof(BaseResultData)));
 		mSharedResult->Map(sizeof(BaseResultData));
 #endif
 		mSharedResult->ShareToProcess(base::GetCurrentProcessHandle(), &resultHandle);
@@ -72,7 +76,8 @@ void WebCLOperationHandler::startHandling()
 		mSharedEvents = adoptPtr(new base::SharedMemory());
 		mSharedEvents->CreateAndMapAnonymous(kMaxEventSize);
 #elif defined(OS_LINUX)
-		mSharedEvents = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(kMaxEventSize).release());
+		// mSharedEvents = adoptPtr(content::RenderThread::Get()->HostAllocateSharedMemoryBuffer(kMaxEventSize).release());
+		mSharedEvents = adoptPtr(Platform::current()->getSharedMemoryForWebCL(kMaxEventSize));
 		mSharedEvents->Map(kMaxEventSize);
 #endif
 		mSharedEvents->ShareToProcess(base::GetCurrentProcessHandle(), &eventsHandle);

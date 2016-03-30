@@ -32,6 +32,7 @@
 #include "core/dom/ExceptionCode.h"
 
 #include "modules/webcl/WebCLException.h"
+
 namespace blink {
 
 static const struct CoreException {
@@ -119,6 +120,7 @@ DOMException* DOMException::create(ExceptionCode ec, const String& sanitizedMess
     if(ec >= WebCLError && ec <= (WebCLError+(WebCLException::WebCLExceptionMax-1))) {
     	return new DOMException(ec, WebCLException::getErrorName(ec), WebCLException::getErrorMessage(ec), unsanitizedMessage);
     }
+	
     const CoreException* entry = getErrorEntry(ec);
     ASSERT(entry);
     return new DOMException(entry->code,

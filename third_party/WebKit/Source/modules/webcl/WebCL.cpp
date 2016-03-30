@@ -378,7 +378,8 @@ WebCLContext* WebCL::createContext(unsigned int deviceType, ExceptionState& ec)
 		context->setGLContext(mGL);
 		mGL = nullptr;
 
-		WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		// WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		mClContextMap.set((cl_obj_key)cl_context_id, context);
 
 		return context;
 	}
@@ -396,6 +397,11 @@ WebCLContext* WebCL::createContext(WebCLPlatform* platform, ExceptionState& ec)
 WebCLContext* WebCL::createContext(WebCLPlatform* platform, unsigned int deviceType, ExceptionState& ec)
 {
 	CLLOG(INFO) << "WebCL::createContext, platform : " << platform << ", deviceType : " << deviceType;
+
+	if (platform == nullptr) {
+		CLLOG(INFO) << "Error:CL_INVALID_PLATFORM";
+		ec.throwDOMException(WebCLException::INVALID_PLATFORM, "WebCLException::INVALID_PLATFORM");
+	}
 
 	if(deviceType == 0) {
 		deviceType = WebCL::DEVICE_TYPE_DEFAULT;
@@ -476,7 +482,8 @@ WebCLContext* WebCL::createContext(WebCLPlatform* platform, unsigned int deviceT
 		context->setGLContext(mGL);
 		mGL = nullptr;
 
-		WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		// WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		mClContextMap.set((cl_obj_key)cl_context_id, context);
 
 		return context;
 	}
@@ -540,7 +547,8 @@ WebCLContext* WebCL::createContext(WebCLDevice* device, ExceptionState& ec)
 		context->setGLContext(mGL);
 		mGL = nullptr;
 
-		WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		// WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		mClContextMap.set((cl_obj_key)cl_context_id, context);
 
 		return context;
 	}
@@ -624,7 +632,8 @@ WebCLContext* WebCL::createContext(HeapVector<Member<WebCLDevice>> devices, Exce
 		context->setGLContext(mGL);
 		mGL = nullptr;
 
-		WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		// WebCLContextMap::AddResult result = mClContextMap.set((cl_obj_key)cl_context_id, context);
+		mClContextMap.set((cl_obj_key)cl_context_id, context);
 
 		return context;
 	}

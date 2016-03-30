@@ -444,6 +444,8 @@ class CONTENT_EXPORT RenderFrameImpl
                               const blink::WebString& source_name,
                               unsigned source_line,
                               const blink::WebString& stack_trace) override;
+  // sendAndroidBroadcast
+  virtual void didSendAndroidBroadcast(const blink::WebString& action);
   void loadURLExternally(const blink::WebURLRequest& request,
                          blink::WebNavigationPolicy policy,
                          const blink::WebString& suggested_name,
@@ -602,6 +604,8 @@ class CONTENT_EXPORT RenderFrameImpl
       const blink::WebSecurityOrigin& security_origin,
       blink::WebSetSinkIdCallbacks* web_callbacks) override;
 
+  blink::WebDeviceApiPermissionCheckClient* deviceApiPermissionClient() override;
+
 #if defined(ENABLE_WEBVR)
   blink::WebVRClient* webVRClient() override;
 #endif
@@ -704,6 +708,8 @@ class CONTENT_EXPORT RenderFrameImpl
   void OnContextMenuClosed(const CustomContextMenuContext& custom_context);
   void OnCustomContextMenuAction(const CustomContextMenuContext& custom_context,
                                  unsigned action);
+  // sendAndroidBroadcast
+  void OnSendAndroidBroadcastResponse(const std::string& action);
   void OnUndo();
   void OnRedo();
   void OnCut();
@@ -1106,6 +1112,8 @@ class CONTENT_EXPORT RenderFrameImpl
 
   // Whether or not this RenderFrame is using Lo-Fi mode.
   bool is_using_lofi_;
+
+  blink::WebDeviceApiPermissionCheckClient* device_api_client_;
 
 #if defined(ENABLE_WEBVR)
   // The VR dispatcher attached to the frame, lazily initialized.

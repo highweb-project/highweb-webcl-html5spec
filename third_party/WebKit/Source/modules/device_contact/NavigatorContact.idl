@@ -1,0 +1,5 @@
+[
+    GarbageCollected,
+] partial interface Navigator {
+    readonly attribute Contact contact;
+};

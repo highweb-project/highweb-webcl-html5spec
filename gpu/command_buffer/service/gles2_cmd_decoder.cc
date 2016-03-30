@@ -1145,7 +1145,6 @@ class GLES2DecoderImpl : public GLES2Decoder, public ErrorStateClient {
 
   // Creates a renderbuffer info for the given renderbuffer.
   void CreateRenderbuffer(GLuint client_id, GLuint service_id) {
-    // DLOG(INFO) << "CreateRenderbuffer, client_id : " << client_id << ", service_id : " << service_id;
     return renderbuffer_manager()->CreateRenderbuffer(
         client_id, service_id);
   }

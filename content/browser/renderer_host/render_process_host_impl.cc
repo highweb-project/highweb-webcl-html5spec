@@ -175,6 +175,9 @@
 #include "ui/gl/gl_switches.h"
 #include "ui/gl/gpu_switching_manager.h"
 #include "ui/native_theme/native_theme_switches.h"
+#include "content/browser/device_api/device_api_permission_check_message_filter.h"
+#include "content/browser/device_sensors/device_proximity_message_filter.h"
+#include "device/applauncher/applauncher_manager_impl.h"
 
 #if defined(OS_ANDROID)
 #include "content/browser/android/child_process_launcher_android.h"
@@ -1028,6 +1031,8 @@ void RenderProcessHostImpl::CreateMessageFilters() {
     bluetooth_dispatcher_host_ = new BluetoothDispatcherHost(GetID());
     AddFilter(bluetooth_dispatcher_host_.get());
   }
+  AddFilter(new DeviceProximityMessageFilter());
+  AddFilter(new DeviceApiPermissionCheckMessageFilter(GetID()));
 }
 
 void RenderProcessHostImpl::RegisterMojoServices() {

@@ -149,6 +149,9 @@ public:
     void cancelIdleCallback(int id) override;
     void schedulePostMessage(PassRefPtrWillBeRawPtr<MessageEvent>, LocalDOMWindow* source, SecurityOrigin* target, PassRefPtrWillBeRawPtr<ScriptCallStack> stackTrace);
 
+    void sendAndroidBroadcast(const String& action, SendAndroidBroadcastCallback*) override;
+    void sendAndroidBroadcastResponse(const String& action) override;
+
     void registerProperty(DOMWindowProperty*);
     void unregisterProperty(DOMWindowProperty*);
 
@@ -280,6 +283,10 @@ private:
     RefPtr<SerializedScriptValue> m_pendingStateObject;
 
     WillBeHeapHashSet<OwnPtrWillBeMember<PostMessageTimer>> m_postMessageTimers;
+
+    #if defined(OS_ANDROID)
+    SendAndroidBroadcastCallback* m_sendAndroidBroadcastCallback = nullptr;
+    #endif
 };
 
 DEFINE_TYPE_CASTS(LocalDOMWindow, DOMWindow, x, x->isLocalDOMWindow(), x.isLocalDOMWindow());

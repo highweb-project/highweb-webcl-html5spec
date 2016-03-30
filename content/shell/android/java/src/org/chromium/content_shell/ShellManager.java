@@ -28,11 +28,7 @@ import org.chromium.ui.base.WindowAndroid;
 @JNINamespace("content")
 public class ShellManager extends FrameLayout {
 
-    public static final String DEFAULT_SHELL_URL = "http://180.66.229.97/test/webcl.html";
-    // public static final String DEFAULT_SHELL_URL = "http://192.168.10.2/context.html";
-    // public static final String DEFAULT_SHELL_URL = "http://192.168.10.2/WebCL-conformance/webcl-conformance-tests.html";    
-	//public static final String DEFAULT_SHELL_URL = "http://192.168.10.2/clgl.html";
-//    public static final String DEFAULT_SHELL_URL = "http://192.168.10.91/WebCL-conformance/conformance/extension/KHR_gl_sharing/bindingTesting/cl_context_createFromGLTexture.html";
+    public static final String DEFAULT_SHELL_URL = "http://www.google.com";
     private static boolean sStartup = true;
     private WindowAndroid mWindow;
     private Shell mActiveShell;

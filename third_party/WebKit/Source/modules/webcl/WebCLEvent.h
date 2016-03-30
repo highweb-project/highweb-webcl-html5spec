@@ -46,6 +46,7 @@ public:
 	cl_event getCLEvent();
 	void setCLEvent(cl_event event);
 	void setCLContext(WebCLContext* context) { mClContext = context; };
+	WebCLContext* getCLContext() { return mClContext; }
 	
 	void triggerCallback(int callbackType);
 
@@ -60,7 +61,7 @@ public:
 private:
 
 	WebCLCommandQueue* getEventCommandQueue(ExceptionState&);
-	
+
 	Member<WebCL> mContext;
 	Member<WebCLContext> mClContext;
 
@@ -81,4 +82,3 @@ protected:
 
 }
 #endif // WebCLEvent_h
-
