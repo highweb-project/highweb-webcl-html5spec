@@ -24,6 +24,7 @@ enum CauseForGpuLaunch {
   CAUSE_FOR_GPU_LAUNCH_JPEGDECODEACCELERATOR_INITIALIZE,
   CAUSE_FOR_GPU_LAUNCH_MOJO_SETUP,
   CAUSE_FOR_GPU_LAUNCH_GET_GPU_SERVICE_REGISTRY,
+  CAUSE_FOR_GPU_LAUNCH_WEBCL,
 
   // All new values should be inserted above this point so that
   // existing values continue to match up with those in histograms.xml.

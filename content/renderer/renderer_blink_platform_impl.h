@@ -41,6 +41,12 @@ class WebMediaRecorderHandler;
 class WebMediaStream;
 class WebSecurityOrigin;
 class WebServiceWorkerCacheStorage;
+class WebDeviceCpuListener;
+class WebDeviceGalleryListener;
+class WebDeviceSoundListener;
+class WebDeviceStorageListener;
+struct WebDeviceGalleryMediaObject;
+struct WebDeviceGalleryFindOptions;
 }
 
 namespace scheduler {
@@ -61,6 +67,12 @@ class ThreadSafeSender;
 class WebClipboardImpl;
 class WebDatabaseObserverImpl;
 class WebFileSystemImpl;
+class DeviceApiContactManager;
+class DeviceApiMessagingManager;
+class DeviceCpuDispatcher;
+class DeviceGalleryDispatcher;
+class DeviceSoundDispatcher;
+class DeviceStorageDispatcher;
 
 class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
  public:
@@ -171,6 +183,7 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
       const blink::WebGraphicsContext3D::Attributes& attributes,
       blink::WebGraphicsContext3D* share_context,
       blink::WebGraphicsContext3D::WebGraphicsInfo* gl_info) override;
+  void createWebCLGPUChannelContext() override;
   blink::WebGraphicsContext3DProvider*
   createSharedOffscreenGraphicsContext3DProvider() override;
   blink::WebCompositorSupport* compositorSupport() override;
@@ -187,6 +200,22 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
                                  blink::WebStorageQuotaCallbacks) override;
   void vibrate(unsigned int milliseconds) override;
   void cancelVibration() override;
+
+  void outputDeviceType(blink::WebDeviceSoundListener* callback) override;
+  void deviceVolume(blink::WebDeviceSoundListener* callback) override;
+  void resetDeviceSoundDispatcher() override;
+
+  void getDeviceStorage(blink::WebDeviceStorageListener* callback) override;
+  void resetDeviceStorageDispatcher() override;
+
+  void getDeviceCpuLoad(blink::WebDeviceCpuListener* callback) override;
+  void resetDeviceCpuDispatcher() override;
+
+  void findMedia(blink::WebDeviceGalleryFindOptions* findOptions, blink::WebDeviceGalleryListener* callback) override;
+  void getMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) override;
+  void deleteMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) override;
+  void resetDeviceGalleryDispatcher() override;
+
   blink::WebThread* currentThread() override;
   void recordRappor(const char* metric,
                     const blink::WebString& sample) override;
@@ -226,6 +255,20 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
   }
 
   blink::WebURLLoader* createURLLoader() override;
+
+  void findContact(blink::WebDeviceContactParameter* parameter) override;
+  void addContact(blink::WebDeviceContactParameter* parameter) override;
+  void deleteContact(blink::WebDeviceContactParameter* parameter) override;
+  void updateContact(blink::WebDeviceContactParameter* parameter) override;
+
+  void sendMessage(blink::WebDeviceMessageObject* message) override;
+  void findMessage(blink::WebDeviceMessagingParameter* parameter) override;
+  void addMessagingListener(blink::WebDeviceMessagingParameter* parameter) override;
+  void removeMessagingListener(blink::WebDeviceMessagingParameter* parameter) override;
+
+  #if defined(OS_LINUX)
+  base::SharedMemory* getSharedMemoryForWebCL(int size) override;
+  #endif
 
  private:
   bool CheckPreparsedJsCachingEnabled() const;
@@ -287,6 +330,10 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
 
   scoped_ptr<blink::WebScrollbarBehavior> web_scrollbar_behavior_;
 
+  scoped_ptr<DeviceSoundDispatcher> devicesound_dispatcher_;
+  scoped_ptr<DeviceStorageDispatcher> devicestorage_dispatcher_;
+  scoped_ptr<DeviceCpuDispatcher> devicecpu_dispatcher_;
+  scoped_ptr<DeviceGalleryDispatcher> devicegallery_dispatcher_;
   // Handle to the Vibration mojo service.
   device::VibrationManagerPtr vibration_manager_;
 
@@ -297,6 +344,8 @@ class CONTENT_EXPORT RendererBlinkPlatformImpl : public BlinkPlatformImpl {
   TrialTokenValidator trial_token_validator_;
 
   scoped_ptr<LocalStorageCachedAreas> local_storage_cached_areas_;
+  scoped_ptr<DeviceApiContactManager> device_contact_manager_;
+  scoped_ptr<DeviceApiMessagingManager> device_messaging_manager_;
 
   DISALLOW_COPY_AND_ASSIGN(RendererBlinkPlatformImpl);
 };

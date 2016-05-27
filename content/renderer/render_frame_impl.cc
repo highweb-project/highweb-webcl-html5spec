@@ -84,6 +84,7 @@
 #include "content/renderer/child_frame_compositing_helper.h"
 #include "content/renderer/context_menu_params_builder.h"
 #include "content/renderer/devtools/devtools_agent.h"
+#include "content/renderer/device_api/device_api_permission_client.h"
 #include "content/renderer/dom_automation_controller.h"
 #include "content/renderer/external_popup_menu.h"
 #include "content/renderer/geolocation_dispatcher.h"
@@ -1023,6 +1024,7 @@ RenderFrameImpl::RenderFrameImpl(const CreateParams& params)
       media_player_delegate_(NULL),
       is_using_lofi_(false),
       is_pasting_(false),
+	  device_api_client_(NULL),	  
       weak_factory_(this) {
   std::pair<RoutingIDFrameMap::iterator, bool> result =
       g_routing_id_frame_map.Get().insert(std::make_pair(routing_id_, this));
@@ -1390,6 +1392,8 @@ bool RenderFrameImpl::OnMessageReceived(const IPC::Message& msg) {
     IPC_MESSAGE_HANDLER(FrameMsg_ContextMenuClosed, OnContextMenuClosed)
     IPC_MESSAGE_HANDLER(FrameMsg_CustomContextMenuAction,
                         OnCustomContextMenuAction)
+    // sendAndroidBroadcast
+    IPC_MESSAGE_HANDLER(FrameMsg_SendAndroidBroadcastResponse, OnSendAndroidBroadcastResponse)
     IPC_MESSAGE_HANDLER(InputMsg_Undo, OnUndo)
     IPC_MESSAGE_HANDLER(InputMsg_Redo, OnRedo)
     IPC_MESSAGE_HANDLER(InputMsg_Cut, OnCut)
@@ -1704,6 +1708,15 @@ void RenderFrameImpl::OnContextMenuClosed(
   }
 
   render_view()->webview()->didCloseContextMenu();
+}
+
+// sendAndroidBroadcast
+void RenderFrameImpl::OnSendAndroidBroadcastResponse(const std::string& action) {
+  blink::WebLocalFrame* frame = GetWebFrame();
+
+  if(frame) {
+    frame->sendAndroidBroadcastResponse(blink::WebString::fromUTF8(action));
+  }
 }
 
 void RenderFrameImpl::OnCustomContextMenuAction(
@@ -2815,6 +2828,12 @@ bool RenderFrameImpl::shouldReportDetailedMessageForSource(
     const blink::WebString& source) {
   return GetContentClient()->renderer()->ShouldReportDetailedMessageForSource(
       source);
+}
+
+// sendAndroidBroadcast
+void RenderFrameImpl::didSendAndroidBroadcast(const blink::WebString& action)
+{
+  Send(new FrameHostMsg_SendAndroidBroadcast(routing_id_, action));
 }
 
 void RenderFrameImpl::didAddMessageToConsole(
@@ -4347,6 +4366,15 @@ blink::WebUSBClient* RenderFrameImpl::usbClient() {
     usb_client_.reset(new WebUSBClientImpl(GetServiceRegistry()));
 
   return usb_client_.get();
+}
+
+blink::WebDeviceApiPermissionCheckClient* RenderFrameImpl::deviceApiPermissionClient()
+{
+	if(!device_api_client_) {
+		device_api_client_ = new DeviceApiPermissionClient(this);
+	}
+
+	return device_api_client_;
 }
 
 #if defined(ENABLE_WEBVR)

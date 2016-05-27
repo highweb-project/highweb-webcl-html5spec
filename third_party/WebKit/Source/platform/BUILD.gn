@@ -336,6 +336,8 @@ component("platform") {
   ]
   deps = [
     "//device/battery:mojo_bindings",
+    "//device/applauncher:mojo_bindings",
+    "//device/calendar:mojo_bindings",
     "//mojo/public/c/system:for_component",
     "//third_party/WebKit/Source/platform/heap",
     "//third_party/harfbuzz-ng",
@@ -459,10 +461,13 @@ source_set("test_support") {
   deps = [
     "//device/battery",
     "//device/battery:mojo_bindings",
+    "//device/applauncher",
+    "//device/applauncher:mojo_bindings",
     "//mojo/edk/system",
   ]
   if (is_android) {
     deps -= [ "//device/battery" ]
+    deps -= [ "//device/applauncher" ]
   }
 
   if (is_win) {

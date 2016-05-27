@@ -30,6 +30,9 @@
 #include "base/containers/hash_tables.h"
 #endif
 
+// gl/cl sharing
+#include "ui/opencl/opencl_include.h"
+
 namespace base {
 class WaitableEvent;
 }
@@ -124,6 +127,11 @@ class CONTENT_EXPORT GpuChannelManager {
 
   GpuChannel* LookupChannel(int32_t client_id) const;
 
+  unsigned int LookupGLServiceId(unsigned int resource_id, GLResourceType glResourceType);
+
+  gpu::SyncPointManager* sync_point_manager() {
+    return sync_point_manager_;
+  }
   gfx::GLSurface* GetDefaultOffscreenSurface();
 
   GpuMemoryBufferFactory* gpu_memory_buffer_factory() {

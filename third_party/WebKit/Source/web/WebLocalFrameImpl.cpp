@@ -241,6 +241,8 @@
 #include "wtf/HashMap.h"
 #include <algorithm>
 
+#include "modules/device_api/DeviceApiPermissionController.h"
+
 namespace blink {
 
 static int frameCount = 0;
@@ -1563,6 +1565,7 @@ void WebLocalFrameImpl::setCoreFrame(PassRefPtrWillBeRawPtr<LocalFrame> frame)
         if (RuntimeEnabledFeatures::installedAppEnabled()) {
             InstalledAppController::provideTo(*m_frame, m_client ? m_client->installedAppClient() : nullptr);
         }
+        DeviceApiPermissionController::provideTo(*m_frame, m_client ? m_client->deviceApiPermissionClient() : nullptr);
     }
 }
 
@@ -2198,5 +2201,13 @@ void WebLocalFrameImpl::forceSandboxFlags(WebSandboxFlags flags)
 {
     frame()->loader().forceSandboxFlags(static_cast<SandboxFlags>(flags));
 }
+
+#if defined(OS_ANDROID)
+void WebLocalFrameImpl::sendAndroidBroadcastResponse(const WebString& action) {
+    if(frame() && frame()->domWindow()) {
+      frame()->domWindow()->sendAndroidBroadcastResponse(action);
+    }
+}
+#endif
 
 } // namespace blink

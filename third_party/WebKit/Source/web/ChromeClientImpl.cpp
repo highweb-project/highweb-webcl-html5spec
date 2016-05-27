@@ -1064,4 +1064,12 @@ PassOwnPtr<WebFrameScheduler> ChromeClientImpl::createFrameScheduler()
     return m_webView->scheduler()->createFrameScheduler().release();
 }
 
+void ChromeClientImpl::sendAndroidBroadcast(LocalFrame* localFrame, const String& action)
+{
+    WebLocalFrameImpl* frame = WebLocalFrameImpl::fromFrame(localFrame);
+    if (frame && frame->client()) {
+        frame->client()->didSendAndroidBroadcast(action);
+    }
+}
+
 } // namespace blink

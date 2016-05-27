@@ -78,6 +78,11 @@
 #include "ui/accessibility/ax_tree_update.h"
 #include "url/gurl.h"
 
+// sendAndroidBroadcast
+#if defined(OS_ANDROID)
+#include "chrome/browser/android/intent_helper.h"
+#endif
+
 #if defined(OS_ANDROID)
 #include "content/browser/mojo/service_registrar_android.h"
 #endif
@@ -514,6 +519,11 @@ bool RenderFrameHostImpl::OnMessageReceived(const IPC::Message &msg) {
   handled = true;
   IPC_BEGIN_MESSAGE_MAP(RenderFrameHostImpl, msg)
     IPC_MESSAGE_HANDLER(FrameHostMsg_AddMessageToConsole, OnAddMessageToConsole)
+    // sendAndroidBroadcast
+    #if defined(OS_ANDROID)
+    IPC_MESSAGE_HANDLER(FrameHostMsg_SendAndroidBroadcast, OnSendAndroidBroadcast)
+    #endif
+    
     IPC_MESSAGE_HANDLER(FrameHostMsg_Detach, OnDetach)
     IPC_MESSAGE_HANDLER(FrameHostMsg_FrameFocused, OnFrameFocused)
     IPC_MESSAGE_HANDLER(FrameHostMsg_DidStartProvisionalLoad,
@@ -798,6 +808,15 @@ void RenderFrameHostImpl::SetRenderFrameCreated(bool created) {
 void RenderFrameHostImpl::Init() {
   ResourceDispatcherHost::ResumeBlockedRequestsForFrameFromUI(this);
 }
+
+// sendAndroidBroadcast
+
+#if defined(OS_ANDROID)
+void RenderFrameHostImpl::OnSendAndroidBroadcast(const base::string16& action) {
+  int process_id_ = GetProcess()->GetID();
+  chrome::android::SendAndroidBroadcastJNI(action, process_id_, routing_id_);
+}
+#endif
 
 void RenderFrameHostImpl::OnAddMessageToConsole(
     int32_t level,

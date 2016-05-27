@@ -28,9 +28,9 @@ static void SetRuntimeFeatureDefaultsForPlatform() {
   // Android does not have support for PagePopup
   WebRuntimeFeatures::enablePagePopup(false);
   // Android does not yet support SharedWorker. crbug.com/154571
-  WebRuntimeFeatures::enableSharedWorker(false);
+  WebRuntimeFeatures::enableSharedWorker(true);
   // Android does not yet support NavigatorContentUtils.
-  WebRuntimeFeatures::enableNavigatorContentUtils(false);
+  WebRuntimeFeatures::enableNavigatorContentUtils(true);
   WebRuntimeFeatures::enableOrientationEvent(true);
   WebRuntimeFeatures::enableFastMobileScrolling(true);
   WebRuntimeFeatures::enableMediaCapture(true);

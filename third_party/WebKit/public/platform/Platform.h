@@ -58,6 +58,10 @@
 #include "mojo/public/cpp/bindings/interface_request.h"
 #include "mojo/public/cpp/system/core.h"
 
+#if defined(OS_LINUX)
+#include "base/memory/shared_memory.h"
+#endif
+
 class GrContext;
 
 namespace blink {
@@ -123,6 +127,16 @@ class WebURLLoader;
 class WebUnitTestSupport;
 struct WebLocalizedString;
 struct WebSize;
+class WebDeviceCpuListener;
+class WebDeviceGalleryListener;
+class WebDeviceSoundListener;
+class WebDeviceStorageListener;
+struct WebDeviceContactFindOptions;
+struct WebDeviceGalleryFindOptions;
+struct WebDeviceGalleryMediaObject;
+struct WebDeviceContactParameter;
+struct WebDeviceMessageObject;
+struct WebDeviceMessagingParameter;
 
 class BLINK_PLATFORM_EXPORT Platform {
 public:
@@ -403,6 +417,23 @@ public:
     // Cancels the current vibration, if there is one.
     virtual void cancelVibration() { }
 
+    //Device Sound Function
+    virtual void outputDeviceType(WebDeviceSoundListener* mCallback) {}
+    virtual void deviceVolume(WebDeviceSoundListener* mCallback) {}
+    virtual void resetDeviceSoundDispatcher() {}
+
+    //Device Storage Function
+    virtual void getDeviceStorage(WebDeviceStorageListener* mCallback) {}
+    virtual void resetDeviceStorageDispatcher() {}
+
+    virtual void getDeviceCpuLoad(WebDeviceCpuListener* mCallback) {}
+    virtual void resetDeviceCpuDispatcher() {}
+
+    //Device Gallery Function
+    virtual void findMedia(blink::WebDeviceGalleryFindOptions* findOptions, blink::WebDeviceGalleryListener* callback) {}
+    virtual void getMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) {}
+    virtual void deleteMedia(blink::WebDeviceGalleryMediaObject* media, blink::WebDeviceGalleryListener* callback) {}
+    virtual void resetDeviceGalleryDispatcher() {}
 
     // Testing -------------------------------------------------------------
 
@@ -455,6 +486,8 @@ public:
     virtual WebGraphicsContext3D* createOffscreenGraphicsContext3D(const WebGraphicsContext3D::Attributes&, WebGraphicsContext3D* shareContext) { return nullptr; }
     virtual WebGraphicsContext3D* createOffscreenGraphicsContext3D(const WebGraphicsContext3D::Attributes&, WebGraphicsContext3D* shareContext, WebGraphicsContext3D::WebGraphicsInfo* glInfo) { return nullptr; }
     virtual WebGraphicsContext3D* createOffscreenGraphicsContext3D(const WebGraphicsContext3D::Attributes&) { return nullptr; }
+
+    virtual void createWebCLGPUChannelContext() {}
 
     // Returns a newly allocated and initialized offscreen context provider. The provider may return a null
     // graphics context if GPU is not supported.
@@ -608,6 +641,22 @@ public:
     // Experimental Framework ----------------------------------------------
 
     virtual WebTrialTokenValidator* trialTokenValidator() { return nullptr; }
+    // Device Contact API--------------------------------------------------
+    virtual void findContact(WebDeviceContactParameter* parameter) {};
+    virtual void addContact(WebDeviceContactParameter* parameter) {};
+    virtual void deleteContact(WebDeviceContactParameter* parameter) {};
+    virtual void updateContact(WebDeviceContactParameter* parameter) {};
+
+    // Device Messaging API--------------------------------------------------
+    virtual void sendMessage(WebDeviceMessageObject* message) {};
+    virtual void findMessage(WebDeviceMessagingParameter* parameter) {};
+    virtual void addMessagingListener(WebDeviceMessagingParameter* parameter) {};
+    virtual void removeMessagingListener(WebDeviceMessagingParameter* parameter) {};
+
+    //WebCL Shared Memory API------------------------------------------------
+    #if defined(OS_LINUX)
+    virtual base::SharedMemory* getSharedMemoryForWebCL(int size) {return nullptr;};
+    #endif
 
 protected:
     Platform();

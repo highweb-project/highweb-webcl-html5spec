@@ -1,0 +1,6 @@
+[Constructor,
+GarbageCollected]
+interface CalendarFindOptions {
+    attribute CalendarEventFilter? filter;
+    attribute boolean?             multiple;
+};

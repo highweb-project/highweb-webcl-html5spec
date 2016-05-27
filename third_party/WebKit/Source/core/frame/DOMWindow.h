@@ -38,6 +38,7 @@ class ScrollToOptions;
 class SerializedScriptValue;
 class Storage;
 class StyleMedia;
+class SendAndroidBroadcastCallback;
 
 typedef HeapVector<Member<MessagePort>, 1> MessagePortArray;
 
@@ -173,6 +174,9 @@ public:
     // Idle callback extensions
     virtual int requestIdleCallback(IdleRequestCallback*, const IdleRequestOptions&) = 0;
     virtual void cancelIdleCallback(int id) = 0;
+
+    virtual void sendAndroidBroadcast(const String& action, SendAndroidBroadcastCallback*) = 0;
+    virtual void sendAndroidBroadcastResponse(const String& action) = 0;
 
     void captureEvents() { }
     void releaseEvents() { }
